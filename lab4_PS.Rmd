@@ -1,0 +1,32 @@
+---
+title: "P&S-2025: Lab assignment 3"
+author: "Yustyna Hayevska, Oleksii Lasiichuk, Ivan Zarytskyi"
+output:
+  html_document:
+    df_print: paged
+---
+
+### Work breakdown:
+
+-   Yustyna Hayevska
+
+-   Oleksii Lasiichuk
+
+-   Ivan Zarytskyi
+
+```{r}
+id <- 13
+```
+
+
+### Task 1
+...
+
+### Task 2
+...
+
+### Task 3
+...
+
+### Task 4
+...
