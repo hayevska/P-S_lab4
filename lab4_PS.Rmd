@@ -8,11 +8,11 @@ output:
 
 ### Work breakdown:
 
--   Yustyna Hayevska
+-   Yustyna Hayevska (Task 3)
 
--   Oleksii Lasiichuk
+-   Oleksii Lasiichuk (Task 1, 2)
 
--   Ivan Zarytskyi
+-   Ivan Zarytskyi (Task 4)
 
 ```{r}
 id <- 13
@@ -20,7 +20,7 @@ id <- 13
 
 
 ### Task 1
-...
+
 
 ### Task 2
 ...
