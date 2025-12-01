@@ -1,5 +1,5 @@
 ---
-title: "P&S-2025: Lab assignment 3"
+title: "P&S-2025: Lab assignment 4"
 author: "Yustyna Hayevska, Oleksii Lasiichuk, Ivan Zarytskyi"
 output:
   html_document:
@@ -14,16 +14,112 @@ output:
 
 -   Ivan Zarytskyi (Task 4)
 
+### Data generation
 ```{r}
-id <- 13
+# team ID
+n <- 13
+
+# function gets fractional part of a number (5.7 -> 0.7)
+get_fractional <- function(x) {
+  return(x - floor(x))
+}
+
+# 100 values of x, and 50 of y (150 total)
+k_values <- 1:150
+
+# apply formula from the assignment
+raw_values <- k_values * log(k_values^2 * n + pi)
+
+a_values <- get_fractional(raw_values)
+
+X <- qnorm(a_values[1:100])
+Y <- qnorm(a_values[101:150])
 ```
 
 
 ### Task 1
+Hypothesis:
+$$H_0: \mu_1 = \mu_2$$
+$$H_1: \mu_1 \neq \mu_2$$
 
+$\sigma_1^2 = \sigma_2^2 = 1$ (Variances are known).
+
+We are testing the equality of means between two independent populations. Since the population variances are known ($\sigma^2 = 1$), the two sample Z-test is the appropriate standard test. (If variances were unknown, we would use a T-test).
+
+For a significance level $\alpha = 0.05$, we reject $H_0$ if $|Z_{stat}| > Z_{0.025}$.
+
+$Z_{0.025} \approx 1.96$.
+So rejection region is: $(-\infty, -1.96) \cup (1.96, \infty)$.
+
+```{r}
+sigma1_sq <- 1
+sigma2_sq <- 1
+n_x <- 100
+n_y <- 50
+alpha <- 0.05
+
+mean_x <- mean(X)
+mean_y <- mean(Y)
+
+# Z-test statistic calculation
+# formula: z = (mean_x - mean_y) / sqrt(sigma1^2/n_x + sigma2^2/n_y)
+standard_error <- sqrt((sigma1_sq / n_x) + (sigma2_sq / n_y))
+z_stat <- (mean_x - mean_y) / standard_error
+
+# P-value for two-sided test: p = 2 * P(Z > |z_stat|)
+p_value_z <- 2 * (1 - pnorm(abs(z_stat)))
+
+
+cat("Sample mean X:", mean_x, "\n")
+cat("Sample mean Y:", mean_y, "\n")
+cat("Z-Statistic:", z_stat, "\n")
+cat("P-value:", p_value_z, "\n")
+
+```
+
+Since the p-value ($0.663$) is significantly higher than our chosen significance level ($\alpha = 0.05$), we fail to reject the null hypothesis.
+
+This indicates that the difference between the sample means ($0.0198$ vs $-0.0557$) is statistically insignificant. There is no evidence that populations for $X$ and $Y$ have different means. 
 
 ### Task 2
-...
+Hypothesis:
+$$H_0: \sigma_1^2 = \sigma_2^2$$
+$$H_1: \sigma_1^2 > \sigma_2^2$$
+$\mu_1$ and $\mu_2$ (means are unknown)
+
+We are going to use F-test for equality of variances. When testing the equality of variances from two normal populations with unknown means, the ratio of sample variances follows an F-distribution.
+
+Rejection Region:This is a one-sided test (greater than). We reject $H_0$ if $F_{stat} > F_{\alpha, n_x-1, n_y-1}$.For $\alpha=0.05$, $df_1 = 99$, $df_2 = 49$.
+
+```{r}
+var_x <- var(X)
+var_y <- var(Y)
+
+#F-Test formula: F = S_x^2 / S_y^2
+f_stat <- var_x / var_y
+
+# P-value
+
+# One-sided test (H1: sigma1^2 > sigma2^2): P(F > f_stat)
+# In R, pf() gives P(F < q), so we use 1 - pf()
+p_value_f <- 1 - pf(f_stat, n_x - 1, n_y - 1)
+
+# Critical value for rejection region
+f_critical <- qf(1 - alpha, n_x - 1, n_y - 1)
+
+cat("Sample Variance X:", var_x, "\n")
+cat("Sample Variance Y:", var_y, "\n")
+cat("F-Statistic:", f_stat, "\n")
+cat("Critical Value:", f_critical, "\n")
+cat("P-value:", p_value_f, "\n")
+
+# --- Conclusion ---
+if(p_value_f < alpha) {
+  cat("Conclusion: Reject Null Hypothesis (H0). Variance of X is significantly greater than Y.")
+} else {
+  cat("Conclusion: Fail to reject Null Hypothesis (H0).")
+}
+```
 
 ### Task 3
 ...
