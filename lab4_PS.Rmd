@@ -143,9 +143,7 @@ Three hypotheses were tested using the KS test at significance level $\alpha = 0
 (c) $\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have the same distributions.
 
 ```{r}
-set.seed(id)
-
-n <- id
+n <- 13
 k <- 1:100
 a_func <- function(i){
   a <- i * log(i^2 * n + pi)
