@@ -113,13 +113,13 @@ cat("F-Statistic:", f_stat, "\n")
 cat("Critical Value:", f_critical, "\n")
 cat("P-value:", p_value_f, "\n")
 
-# --- Conclusion ---
-if(p_value_f < alpha) {
-  cat("Conclusion: Reject Null Hypothesis (H0). Variance of X is significantly greater than Y.")
-} else {
-  cat("Conclusion: Fail to reject Null Hypothesis (H0).")
-}
 ```
+
+We conducted a one-sided F-test to check if the variance of population X is greater than population Y ($H_0: \sigma_1^2 = \sigma_2^2$ vs $H_1: \sigma_1^2 > \sigma_2^2$).
+
+The calculated F-statistic is 1.367, which is less than the critical value of 1.531. Correspondingly, the p-value is 0.113
+
+Since the p-value ($0.113$) is higher than our chosen significance level ($\alpha = 0.05$), we fail to reject the null hypothesis.This indicates that while the sample variance of X ($1.10$) appears larger than Y ($0.80$), this difference is statistically insignificant. The data does not provide sufficient evidence to claim that the true population variance of X is greater than that of Y.
 
 ### Task 3
 ...
