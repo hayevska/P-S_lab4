@@ -143,35 +143,22 @@ Three hypotheses were tested using the KS test at significance level $\alpha = 0
 (c) $\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have the same distributions.
 
 ```{r}
-n <- 13
-k <- 1:100
-a_func <- function(i){
-  a <- i * log(i^2 * n + pi)
-  a_frac <- a- floor(a)
-  return (a_frac)
-}
+# Parameters estimated from the sample for normal distribution
+mu_x <- mean(X)
+sd_x <- sd(X)
 
-k <- 1:100
-l <- 101:150
-
-x <- qnorm(sapply(k, a_func))
-y <- qnorm(sapply(l, a_func))
-
-mu_x <- mean(x)
-sd_x <- sd(x)
-
-#a)
-ks.test_a <- ks.test(x, "pnorm", mean = mu_x, sd = sd_x)
+#a) Test if x is normally distributed
+ks.test_a <- ks.test(X, "pnorm", mean = mu_x, sd = sd_x)
 cat("a) Test if x is normally distributed\n")
 ks.test_a
 
-#b)
-ks.test_b <- ks.test(x, "pexp", rate = 1)
+#b) Test if x is exponentially distributed
+ks.test_b <- ks.test(X, "pexp", rate = 1)
 cat("b) Test if x is exponentially distributed\n")
 ks.test_b
 
-#c)
-ks.test_c <- ks.test(x, y)
+#c) Test if x and y have the same distribution
+ks.test_c <- ks.test(X, Y)
 cat("c) Test if x and y have the same distribution\n")
 ks.test_c
 ```
