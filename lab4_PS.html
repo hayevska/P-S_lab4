@@ -1779,54 +1779,41 @@ exponentially distributed with <span class="math inline">\(\lambda =
 <span class="math inline">\(\{y_l\}_{l=1}^{50}\)</span> have the same
 distributions.</p></li>
 </ol>
-<pre class="r"><code>n &lt;- 13
-k &lt;- 1:100
-a_func &lt;- function(i){
-  a &lt;- i * log(i^2 * n + pi)
-  a_frac &lt;- a- floor(a)
-  return (a_frac)
-}
+<pre class="r"><code># Parameters estimated from the sample for normal distribution
+mu_x &lt;- mean(X)
+sd_x &lt;- sd(X)
 
-k &lt;- 1:100
-l &lt;- 101:150
-
-x &lt;- qnorm(sapply(k, a_func))
-y &lt;- qnorm(sapply(l, a_func))
-
-mu_x &lt;- mean(x)
-sd_x &lt;- sd(x)
-
-#a)
-ks.test_a &lt;- ks.test(x, &quot;pnorm&quot;, mean = mu_x, sd = sd_x)
+#a) Test if x is normally distributed
+ks.test_a &lt;- ks.test(X, &quot;pnorm&quot;, mean = mu_x, sd = sd_x)
 cat(&quot;a) Test if x is normally distributed\n&quot;)</code></pre>
 <pre><code>## a) Test if x is normally distributed</code></pre>
 <pre class="r"><code>ks.test_a</code></pre>
 <pre><code>## 
 ##  Asymptotic one-sample Kolmogorov-Smirnov test
 ## 
-## data:  x
+## data:  X
 ## D = 0.066605, p-value = 0.7667
 ## alternative hypothesis: two-sided</code></pre>
-<pre class="r"><code>#b)
-ks.test_b &lt;- ks.test(x, &quot;pexp&quot;, rate = 1)
+<pre class="r"><code>#b) Test if x is exponentially distributed
+ks.test_b &lt;- ks.test(X, &quot;pexp&quot;, rate = 1)
 cat(&quot;b) Test if x is exponentially distributed\n&quot;)</code></pre>
 <pre><code>## b) Test if x is exponentially distributed</code></pre>
 <pre class="r"><code>ks.test_b</code></pre>
 <pre><code>## 
 ##  Asymptotic one-sample Kolmogorov-Smirnov test
 ## 
-## data:  x
+## data:  X
 ## D = 0.53, p-value &lt; 2.2e-16
 ## alternative hypothesis: two-sided</code></pre>
-<pre class="r"><code>#c)
-ks.test_c &lt;- ks.test(x, y)
+<pre class="r"><code>#c) Test if x and y have the same distribution
+ks.test_c &lt;- ks.test(X, Y)
 cat(&quot;c) Test if x and y have the same distribution\n&quot;)</code></pre>
 <pre><code>## c) Test if x and y have the same distribution</code></pre>
 <pre class="r"><code>ks.test_c</code></pre>
 <pre><code>## 
 ##  Exact two-sample Kolmogorov-Smirnov test
 ## 
-## data:  x and y
+## data:  X and Y
 ## D = 0.14, p-value = 0.5185
 ## alternative hypothesis: two-sided</code></pre>
 <p>Explain the main idea behind the Kolmogorov-Smirnov test and comment
