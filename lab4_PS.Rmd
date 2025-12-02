@@ -8,7 +8,7 @@ output:
 
 ### Work breakdown:
 
--   Yustyna Hayevska
+-   Yustyna Hayevska: Task 3
 
 -   Oleksii Lasiichuk
 
@@ -18,15 +18,156 @@ output:
 id <- 13
 ```
 
-
 ### Task 1
+
 ...
 
 ### Task 2
+
 ...
 
-### Task 3
-...
+## Task 3
+
+Applies the Kolmogorov-Smirnov test to investigate the distributional properties of sets generated via the inverse normal CDF.
+
+Data were generated using: $a_k = \{k \ln(k^2 n + \pi)\}, \quad k \geq 1$
+
+where ${x} = x - \lfloor x \rfloor$ denotes the fractional part and $n$ is the student ID. Samples were obtained as:
+
+$x_k = \Phi^{-1}(a_k), \quad k = 1, \ldots, 100$
+
+$y_l = \Phi^{-1}(a_{l+100}), \quad l = 1, \ldots, 50$
+
+Three hypotheses were tested using the KS test at significance level $\alpha = 0.05$:
+
+(a) $\{x_k\}_{k=1}^{100}$ are normally distributed (with parameters calculated from the sample);
+
+(b) $\{|x_k|\}_{k=1}^{100}$ are exponentially distributed with $\lambda = 1$;
+
+(c) $\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have the same distributions.
+
+```{r}
+set.seed(id)
+
+n <- id
+k <- 1:100
+a_func <- function(i){
+  a <- i * log(i^2 * n + pi)
+  a_frac <- a- floor(a)
+  return (a_frac)
+}
+
+k <- 1:100
+l <- 101:150
+
+x <- qnorm(sapply(k, a_func))
+y <- qnorm(sapply(l, a_func))
+
+mu_x <- mean(x)
+sd_x <- sd(x)
+
+#a)
+ks.test_a <- ks.test(x, "pnorm", mean = mu_x, sd = sd_x)
+cat("a) Test if x is normally distributed\n")
+ks.test_a
+
+#b)
+ks.test_b <- ks.test(x, "pexp", rate = 1)
+cat("b) Test if x is exponentially distributed\n")
+ks.test_b
+
+#c)
+ks.test_c <- ks.test(x, y)
+cat("c) Test if x and y have the same distribution\n")
+ks.test_c
+```
+
+Explain the main idea behind the Kolmogorov-Smirnov test and comment on the outcomes of the test.
+
+**The Kolmogorov-Smirnov test** measures the **maximum vertical distance** between two cumulative distribution functions (CDFs):\
+- One-sample KS test: Compares the empirical CDF of a sample to a it's theoretical CDF\
+- Two-sample KS test: Compares the empirical CDFs of two samples
+
+For a sample of size n, **the empirical CDF** is:\
+$F_n(x) = \frac{\#\{i | x_i \leq x\}}{n}$
+
+The **KS test statistic** is defined as:\
+$D = \max_x |F_n(x) - F_0(x)|$\
+Where:\
+- $F_n(x)$ is the empirical cumulative distribution function of the sample\
+- $F_0(x)$ is the theoretical CDF under the null hypothesis
+
+**Results**:\
+- Large D (\> 0.50): ECDF deviates substantially from the CDF - reject $H_0$\
+- Small D (\< 0.25): ECDF closely matches the CDF - do not reject $H_0$ If 0.25 \<= D \<= 0.56, our distributions have poor fit, which indicates that we are likely to reject the null hypothesis, but not sure enough, so we rely on p-value more than usual.
+
+**Advantages**:\
+- Doesn't require normality\
+- Sensitive to location, scale and differences, so is very precise\
+- Applies to any continuous distribution\
+- Measures the maximum discrepancy directly\
+
+### a) Test if x is normally distributed
+
+data: x\
+D = 0.066605, p-value = 0.7667
+
+The maximum vertical distance between the empirical CDF of x and the theoretical normal CDF is only 0.0666 (6.66%).\
+This is an **extremely small discrepancy**.
+
+The high p-value (0.7667) indicates that such a small discrepancy would occur approximately 77% of the time, if x truly followed a normal distribution.\
+**We fail to reject** $H_0$.
+
+**Conclusion**:\
+$\{x_k\}_{k=1}^{100}$ is highly consistent with a normal distribution. The empirical and theoretical CDFs overlap almost perfectly.
+
+### b) Test if x is exponentially distributed
+
+data: x\
+D = 0.53, p-value \< 2.2e-16
+
+The maximum vertical distance between the empirical CDF of x and the theoretical exponential CDF is 0.53 (53%).\
+This is a **high discrepancy**.
+
+The reasons for it:\
+- Exp. is right-skewed; Normal is symmetric;\
+- X contains negative values, while values from Exp. dist. are always \>= 0;\
+- Location differs: mean(x) = -0.045 and mean of exp(1) = 1;
+
+P-value \< 2.2e-16, which indicates that such a large discrepancy would never occur by random chance, if x truly followed an exponential distribution.\
+**We reject the null hypothesis**.
+
+**Conclusion**:\
+$\{x_k\}_{k=1}^{100}$ are not exponentially distributed with $\lambda = 1$;
+
+### c) Test if x and y have the same distribution 
+
+data: x and y\
+D = 0.14, p-value = 0.5185
+
+The maximum vertical distance between the empirical CDFs of x and y is 0.14 (14%).\
+This is a **modest discrepancy**.
+
+The reasons for it:\
+- Similar location (means = 0), spread (var = 1), ranges (-3;3);\
+- Same generation from $N(0, 1)$;\
+- Differs by sample size (50 and 100).
+
+P-value = 0.5185, which indicates that difference of 14% or bigger would occur approximately 52% of the time, if x and y truly came from the same distribution.\
+**We fail to reject** $H_0$.
+
+**Conclusion**:\
+$\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have pretty similar distributions.
+
+## Summary
+The Kolmogorov-Smirnov (KS) test was applied to assess the distributional properties of samples generated via the inverse normal CDF. The data were constructed using the fractional part of a sequence passed through the normal quantile function. The KS test evaluates the maximum vertical discrepancy between empirical cumulative distribution functions (ECDFs) or between an ECDF and a theoretical CDF.
+
+For hypothesis (a), the sample ${x_k}$ was tested against a normal distribution with estimated parameters; the test returned a p-value of 0.7667, indicating no significant deviation from normality. \
+In (b), test against an exponential distribution with rate 1 gave a p-value < 2.2e-16, rejecting the hypothesis due to big differences in shape and properties. \
+For (c), the two-sample KS test between ${x_k}$ and ${y_l}$ produced a p-value of 0.5185, indicating no significant difference in their distributions, aligning with both being derived from the same underlying normal distribution. \
+
+Overall, the results show that the generated samples behave like normally distributed, are clearly not exponential, and have very similar distributions across different subsets of the data.
 
 ### Task 4
+
 ...
