@@ -1639,6 +1639,7 @@ Zarytskyi</h4>
 <h3>Data generation</h3>
 <pre class="r"><code># team ID
 n &lt;- 13
+set.seed(n)
 
 # function gets fractional part of a number (5.7 -&gt; 0.7)
 get_fractional &lt;- function(x) {
@@ -1741,21 +1742,196 @@ cat(&quot;Sample Variance X:&quot;, var_x, &quot;\n&quot;)</code></pre>
 <pre><code>## Critical Value: 1.530999</code></pre>
 <pre class="r"><code>cat(&quot;P-value:&quot;, p_value_f, &quot;\n&quot;)</code></pre>
 <pre><code>## P-value: 0.1131055</code></pre>
-<pre class="r"><code># --- Conclusion ---
-if(p_value_f &lt; alpha) {
-  cat(&quot;Conclusion: Reject Null Hypothesis (H0). Variance of X is significantly greater than Y.&quot;)
-} else {
-  cat(&quot;Conclusion: Fail to reject Null Hypothesis (H0).&quot;)
-}</code></pre>
-<pre><code>## Conclusion: Fail to reject Null Hypothesis (H0).</code></pre>
+<p>We conducted a one-sided F-test to check if the variance of
+population X is greater than population Y (<span class="math inline">\(H_0: \sigma_1^2 = \sigma_2^2\)</span> vs <span class="math inline">\(H_1: \sigma_1^2 &gt; \sigma_2^2\)</span>).</p>
+<p>The calculated F-statistic is 1.367, which is less than the critical
+value of 1.531. Correspondingly, the p-value is 0.113</p>
+<p>Since the p-value (<span class="math inline">\(0.113\)</span>) is
+higher than our chosen significance level (<span class="math inline">\(\alpha = 0.05\)</span>), we fail to reject the
+null hypothesis.This indicates that while the sample variance of X
+(<span class="math inline">\(1.10\)</span>) appears larger than Y (<span class="math inline">\(0.80\)</span>), this difference is statistically
+insignificant. The data does not provide sufficient evidence to claim
+that the true population variance of X is greater than that of Y.</p>
 </div>
-<div id="task-3" class="section level3">
-<h3>Task 3</h3>
-<p>…</p>
+<div id="task-3" class="section level2">
+<h2>Task 3</h2>
+<p>Applies the Kolmogorov-Smirnov test to investigate the distributional
+properties of sets generated via the inverse normal CDF.</p>
+<p>Data were generated using: <span class="math inline">\(a_k = \{k
+\ln(k^2 n + \pi)\}, \quad k \geq 1\)</span></p>
+<p>where <span class="math inline">\({x} = x - \lfloor x
+\rfloor\)</span> denotes the fractional part and <span class="math inline">\(n\)</span> is the student ID. Samples were
+obtained as:</p>
+<p><span class="math inline">\(x_k = \Phi^{-1}(a_k), \quad k = 1,
+\ldots, 100\)</span></p>
+<p><span class="math inline">\(y_l = \Phi^{-1}(a_{l+100}), \quad l = 1,
+\ldots, 50\)</span></p>
+<p>Three hypotheses were tested using the KS test at significance level
+<span class="math inline">\(\alpha = 0.05\)</span>:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p><span class="math inline">\(\{x_k\}_{k=1}^{100}\)</span> are
+normally distributed (with parameters calculated from the
+sample);</p></li>
+<li><p><span class="math inline">\(\{|x_k|\}_{k=1}^{100}\)</span> are
+exponentially distributed with <span class="math inline">\(\lambda =
+1\)</span>;</p></li>
+<li><p><span class="math inline">\(\{x_k\}_{k=1}^{100}\)</span> and
+<span class="math inline">\(\{y_l\}_{l=1}^{50}\)</span> have the same
+distributions.</p></li>
+</ol>
+<pre class="r"><code># Parameters estimated from the sample for normal distribution
+mu_x &lt;- mean(X)
+sd_x &lt;- sd(X)
+
+#a) Test if x is normally distributed
+ks.test_a &lt;- ks.test(X, &quot;pnorm&quot;, mean = mu_x, sd = sd_x)
+cat(&quot;a) Test if x is normally distributed\n&quot;)</code></pre>
+<pre><code>## a) Test if x is normally distributed</code></pre>
+<pre class="r"><code>ks.test_a</code></pre>
+<pre><code>## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  X
+## D = 0.066605, p-value = 0.7667
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>#b) Test if x is exponentially distributed
+ks.test_b &lt;- ks.test(X, &quot;pexp&quot;, rate = 1)
+cat(&quot;b) Test if x is exponentially distributed\n&quot;)</code></pre>
+<pre><code>## b) Test if x is exponentially distributed</code></pre>
+<pre class="r"><code>ks.test_b</code></pre>
+<pre><code>## 
+##  Asymptotic one-sample Kolmogorov-Smirnov test
+## 
+## data:  X
+## D = 0.53, p-value &lt; 2.2e-16
+## alternative hypothesis: two-sided</code></pre>
+<pre class="r"><code>#c) Test if x and y have the same distribution
+ks.test_c &lt;- ks.test(X, Y)
+cat(&quot;c) Test if x and y have the same distribution\n&quot;)</code></pre>
+<pre><code>## c) Test if x and y have the same distribution</code></pre>
+<pre class="r"><code>ks.test_c</code></pre>
+<pre><code>## 
+##  Exact two-sample Kolmogorov-Smirnov test
+## 
+## data:  X and Y
+## D = 0.14, p-value = 0.5185
+## alternative hypothesis: two-sided</code></pre>
+<p>Explain the main idea behind the Kolmogorov-Smirnov test and comment
+on the outcomes of the test.</p>
+<p><strong>The Kolmogorov-Smirnov test</strong> measures the
+<strong>maximum vertical distance</strong> between two cumulative
+distribution functions (CDFs):<br />
+- One-sample KS test: Compares the empirical CDF of a sample to a it’s
+theoretical CDF<br />
+- Two-sample KS test: Compares the empirical CDFs of two samples</p>
+<p>For a sample of size n, <strong>the empirical CDF</strong> is:<br />
+<span class="math inline">\(F_n(x) = \frac{\#\{i | x_i \leq
+x\}}{n}\)</span></p>
+<p>The <strong>KS test statistic</strong> is defined as:<br />
+<span class="math inline">\(D = \max_x |F_n(x) - F_0(x)|\)</span><br />
+Where:<br />
+- <span class="math inline">\(F_n(x)\)</span> is the empirical
+cumulative distribution function of the sample<br />
+- <span class="math inline">\(F_0(x)\)</span> is the theoretical CDF
+under the null hypothesis</p>
+<p><strong>Results</strong>:<br />
+- Large D (&gt; 0.50): ECDF deviates substantially from the CDF - reject
+<span class="math inline">\(H_0\)</span><br />
+- Small D (&lt; 0.25): ECDF closely matches the CDF - do not reject
+<span class="math inline">\(H_0\)</span> If 0.25 &lt;= D &lt;= 0.56, our
+distributions have poor fit, which indicates that we are likely to
+reject the null hypothesis, but not sure enough, so we rely on p-value
+more than usual.</p>
+<p><strong>Advantages</strong>:<br />
+- Doesn’t require normality<br />
+- Sensitive to location, scale and differences, so is very precise<br />
+- Applies to any continuous distribution<br />
+- Measures the maximum discrepancy directly<br />
+</p>
+<div id="a-test-if-x-is-normally-distributed" class="section level3">
+<h3>a) Test if x is normally distributed</h3>
+<p>data: x<br />
+D = 0.066605, p-value = 0.7667</p>
+<p>The maximum vertical distance between the empirical CDF of x and the
+theoretical normal CDF is only 0.0666 (6.66%).<br />
+This is an <strong>extremely small discrepancy</strong>.</p>
+<p>The high p-value (0.7667) indicates that such a small discrepancy
+would occur approximately 77% of the time, if x truly followed a normal
+distribution.<br />
+<strong>We fail to reject</strong> <span class="math inline">\(H_0\)</span>.</p>
+<p><strong>Conclusion</strong>:<br />
+<span class="math inline">\(\{x_k\}_{k=1}^{100}\)</span> is highly
+consistent with a normal distribution. The empirical and theoretical
+CDFs overlap almost perfectly.</p>
 </div>
+<div id="b-test-if-x-is-exponentially-distributed" class="section level3">
+<h3>b) Test if x is exponentially distributed</h3>
+<p>data: x<br />
+D = 0.53, p-value &lt; 2.2e-16</p>
+<p>The maximum vertical distance between the empirical CDF of x and the
+theoretical exponential CDF is 0.53 (53%).<br />
+This is a <strong>high discrepancy</strong>.</p>
+<p>The reasons for it:<br />
+- Exp. is right-skewed; Normal is symmetric;<br />
+- X contains negative values, while values from Exp. dist. are always
+&gt;= 0;<br />
+- Location differs: mean(x) = -0.045 and mean of exp(1) = 1;</p>
+<p>P-value &lt; 2.2e-16, which indicates that such a large discrepancy
+would never occur by random chance, if x truly followed an exponential
+distribution.<br />
+<strong>We reject the null hypothesis</strong>.</p>
+<p><strong>Conclusion</strong>:<br />
+<span class="math inline">\(\{x_k\}_{k=1}^{100}\)</span> are not
+exponentially distributed with <span class="math inline">\(\lambda =
+1\)</span>;</p>
+</div>
+<div id="c-test-if-x-and-y-have-the-same-distribution" class="section level3">
+<h3>c) Test if x and y have the same distribution</h3>
+<p>data: x and y<br />
+D = 0.14, p-value = 0.5185</p>
+<p>The maximum vertical distance between the empirical CDFs of x and y
+is 0.14 (14%).<br />
+This is a <strong>modest discrepancy</strong>.</p>
+<p>The reasons for it:<br />
+- Similar location (means = 0), spread (var = 1), ranges (-3;3);<br />
+- Same generation from <span class="math inline">\(N(0,
+1)\)</span>;<br />
+- Differs by sample size (50 and 100).</p>
+<p>P-value = 0.5185, which indicates that difference of 14% or bigger
+would occur approximately 52% of the time, if x and y truly came from
+the same distribution.<br />
+<strong>We fail to reject</strong> <span class="math inline">\(H_0\)</span>.</p>
+<p><strong>Conclusion</strong>:<br />
+<span class="math inline">\(\{x_k\}_{k=1}^{100}\)</span> and <span class="math inline">\(\{y_l\}_{l=1}^{50}\)</span> have pretty similar
+distributions.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>The Kolmogorov-Smirnov (KS) test was applied to assess the
+distributional properties of samples generated via the inverse normal
+CDF. The data were constructed using the fractional part of a sequence
+passed through the normal quantile function. The KS test evaluates the
+maximum vertical discrepancy between empirical cumulative distribution
+functions (ECDFs) or between an ECDF and a theoretical CDF.</p>
+<p>For hypothesis (a), the sample <span class="math inline">\({x_k}\)</span> was tested against a normal
+distribution with estimated parameters; the test returned a p-value of
+0.7667, indicating no significant deviation from normality.<br />
+In (b), test against an exponential distribution with rate 1 gave a
+p-value &lt; 2.2e-16, rejecting the hypothesis due to big differences in
+shape and properties.<br />
+For (c), the two-sample KS test between <span class="math inline">\({x_k}\)</span> and <span class="math inline">\({y_l}\)</span> produced a p-value of 0.5185,
+indicating no significant difference in their distributions, aligning
+with both being derived from the same underlying normal
+distribution.<br />
+</p>
+<p>Overall, the results show that the generated samples behave like
+normally distributed, are clearly not exponential, and have very similar
+distributions across different subsets of the data.</p>
 <div id="task-4" class="section level3">
 <h3>Task 4</h3>
 <p>…</p>
+</div>
 </div>
 
 
