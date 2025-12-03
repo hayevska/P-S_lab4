@@ -4,6 +4,9 @@ author: "Yustyna Hayevska, Oleksii Lasiichuk, Ivan Zarytskyi"
 output:
   html_document:
     df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ### Work breakdown:
@@ -15,6 +18,7 @@ output:
 -   Ivan Zarytskyi (Task 4)
 
 ### Data generation
+
 ```{r}
 # team ID
 n <- 13
@@ -37,20 +41,22 @@ X <- qnorm(a_values[1:100])
 Y <- qnorm(a_values[101:150])
 ```
 
-
 ### Task 1
-Hypothesis:
-$$H_0: \mu_1 = \mu_2$$
-$$H_1: \mu_1 \neq \mu_2$$
+
+Hypothesis: $$H_0: \mu_1 = \mu_2$$ $$H_1: \mu_1 \neq \mu_2$$
 
 $\sigma_1^2 = \sigma_2^2 = 1$ (Variances are known).
 
-We are testing the equality of means between two independent populations. Since the population variances are known ($\sigma^2 = 1$), the two sample Z-test is the appropriate standard test. (If variances were unknown, we would use a T-test).
+We are testing the equality of means between two independent
+populations. Since the population variances are known ($\sigma^2 = 1$),
+the two sample Z-test is the appropriate standard test. (If variances
+were unknown, we would use a T-test).
 
-For a significance level $\alpha = 0.05$, we reject $H_0$ if $|Z_{stat}| > Z_{0.025}$.
+For a significance level $\alpha = 0.05$, we reject $H_0$ if
+$|Z_{stat}| > Z_{0.025}$.
 
-$Z_{0.025} \approx 1.96$.
-So rejection region is: $(-\infty, -1.96) \cup (1.96, \infty)$.
+$Z_{0.025} \approx 1.96$. So rejection region is:
+$(-\infty, -1.96) \cup (1.96, \infty)$.
 
 ```{r}
 sigma1_sq <- 1
@@ -78,19 +84,26 @@ cat("P-value:", p_value_z, "\n")
 
 ```
 
-Since the p-value ($0.663$) is significantly higher than our chosen significance level ($\alpha = 0.05$), we fail to reject the null hypothesis.
+Since the p-value ($0.663$) is significantly higher than our chosen
+significance level ($\alpha = 0.05$), we fail to reject the null
+hypothesis.
 
-This indicates that the difference between the sample means ($0.0198$ vs $-0.0557$) is statistically insignificant. There is no evidence that populations for $X$ and $Y$ have different means. 
+This indicates that the difference between the sample means ($0.0198$ vs
+$-0.0557$) is statistically insignificant. There is no evidence that
+populations for $X$ and $Y$ have different means.
 
 ### Task 2
-Hypothesis:
-$$H_0: \sigma_1^2 = \sigma_2^2$$
-$$H_1: \sigma_1^2 > \sigma_2^2$$
-$\mu_1$ and $\mu_2$ (means are unknown)
 
-We are going to use F-test for equality of variances. When testing the equality of variances from two normal populations with unknown means, the ratio of sample variances follows an F-distribution.
+Hypothesis: $$H_0: \sigma_1^2 = \sigma_2^2$$
+$$H_1: \sigma_1^2 > \sigma_2^2$$ $\mu_1$ and $\mu_2$ (means are unknown)
 
-Rejection Region:This is a one-sided test (greater than). We reject $H_0$ if $F_{stat} > F_{\alpha, n_x-1, n_y-1}$.For $\alpha=0.05$, $df_1 = 99$, $df_2 = 49$.
+We are going to use F-test for equality of variances. When testing the
+equality of variances from two normal populations with unknown means,
+the ratio of sample variances follows an F-distribution.
+
+Rejection Region:This is a one-sided test (greater than). We reject
+$H_0$ if $F_{stat} > F_{\alpha, n_x-1, n_y-1}$.For $\alpha=0.05$,
+$df_1 = 99$, $df_2 = 49$.
 
 ```{r}
 var_x <- var(X)
@@ -116,11 +129,19 @@ cat("P-value:", p_value_f, "\n")
 
 ```
 
-We conducted a one-sided F-test to check if the variance of population X is greater than population Y ($H_0: \sigma_1^2 = \sigma_2^2$ vs $H_1: \sigma_1^2 > \sigma_2^2$).
+We conducted a one-sided F-test to check if the variance of population X
+is greater than population Y ($H_0: \sigma_1^2 = \sigma_2^2$ vs
+$H_1: \sigma_1^2 > \sigma_2^2$).
 
-The calculated F-statistic is 1.367, which is less than the critical value of 1.531. Correspondingly, the p-value is 0.113
+The calculated F-statistic is 1.367, which is less than the critical
+value of 1.531. Correspondingly, the p-value is 0.113
 
-Since the p-value ($0.113$) is higher than our chosen significance level ($\alpha = 0.05$), we fail to reject the null hypothesis.This indicates that while the sample variance of X ($1.10$) appears larger than Y ($0.80$), this difference is statistically insignificant. The data does not provide sufficient evidence to claim that the true population variance of X is greater than that of Y.
+Since the p-value ($0.113$) is higher than our chosen significance level
+($\alpha = 0.05$), we fail to reject the null hypothesis.This indicates
+that while the sample variance of X ($1.10$) appears larger than Y
+($0.80$), this difference is statistically insignificant. The data does
+not provide sufficient evidence to claim that the true population
+variance of X is greater than that of Y.
 
 ## Task 3
 
@@ -251,4 +272,59 @@ Overall, the results show that the generated samples behave like normally distri
 
 ### Task 4
 
-...
+```{r}
+data <- read.csv("data.csv")
+plot(data$time_study, data$Marks,
+     main = "Scatter Plot of Marks vs Study Time",
+     xlab = "Study Time (hours)",
+     ylab = "Marks",
+     col = "blue",
+     pch = 19)
+
+model <- lm(Marks~time_study, data = data)
+abline(model)
+summary(model)
+
+new_student <- data.frame(time_study = 8)
+
+predicted_mark <- predict(model, newdata = new_student)
+cat("Predicted mark for Alice (8 hours):", predicted_mark, "\n")
+```
+
+To obtain the model we minimize the **squared residuals sum**:
+
+$$
+R := \sum(Y_k - a - bx_k)^2
+$$
+
+Therefore the estimator are equal to:
+
+$$
+\widehat{a} = \overline{Y} - \widehat{b} \overline{\mathbf{x}}, \quad \widehat{b}=\frac{S_{\mathbf{x} Y}}{S_{\mathbf{x}\mathbf{x}}}:=\frac{\sum(x_i-\overline{\mathbf{x}})(Y_i-\overline{Y})}{\sum (x_i - \overline{\mathbf{x}})^2}
+$$
+
+Ideas to improve the data:
+
+1.  Include other data (attendance, sleep time, previous marks and so
+    on)
+2.  Use non-linear regression (polynomial or logarithmic)
+3.  Better inspection of data. Look for outliers and suspicious data
+    points.
+
+```{r}
+plot(data$time_study, data$Marks,
+     main = "Scatter Plot of Marks vs Study Time",
+     xlab = "Study Time (hours)",
+     ylab = "Marks",
+     col = "blue",
+     pch = 19)
+
+non_linear <- lm(Marks ~ time_study + I(time_study^2), data = data)
+time_seq <- seq(min(data$time_study), max(data$time_study), length.out = 100)
+curve_data <- data.frame(time_study = time_seq)
+curve_preds <- predict(non_linear, newdata = curve_data)
+
+# Add the curve to the plot
+lines(time_seq, curve_preds, col = "green", lwd = 2)
+summary(non_linear)
+```
